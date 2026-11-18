@@ -26,6 +26,8 @@ as of 2026-11-18, 1 account(s) no login for 90+ days:
 
 `leavers.csv`: `employee_id,name,leave_date`
 
+If a column is missing it stops and tells you which one. Active account with empty `last_login` is listed as `never`. Active account with empty `user_id` cannot be matched, so it is listed for checking by hand.
+
 Sample files are in `sample/`, all fake people.
 
 ## not done yet

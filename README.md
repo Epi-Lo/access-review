@@ -4,15 +4,20 @@ Small script for user access review. Give it the user list from a system and the
 
 This is the most common finding in an ITGC access review, so start from this one first.
 
+It also lists active accounts with no login for 90+ days, as of the date you give (default today).
+
 ```sh
-python access_review.py sample/users.csv sample/leavers.csv
+python access_review.py sample/users.csv sample/leavers.csv 2026-11-18
 ```
 
 ```
-checked 7 active accounts against 3 leavers
+checked 8 active accounts against 3 leavers
 2 leaver(s) still active:
   E1004  Chan Tai Man  left 2026-09-30  last login 2026-10-12
   E1006  Ho Chi Kit  left 2026-07-31  last login 2026-08-01
+
+as of 2026-11-18, 1 account(s) no login for 90+ days:
+  E1009  Cheung Wing Yan  last login 2026-05-20
 ```
 
 ## csv format
@@ -25,7 +30,7 @@ Sample files are in `sample/`, all fake people.
 
 ## not done yet
 
-- no dormant account check (no login for a long time)
+- 90 days is fixed for now
 - no admin / privileged account check
 
 Python 3, no extra package needed.

@@ -8,6 +8,27 @@ def load(path):
         return list(csv.DictReader(f))
 
 
+def clean_id(s):
+    # hr export got space and small letter, system side is "E1004"
+    return s.strip().upper()
+
+
+def find_leavers(users, leavers):
+    active_count = 0
+    found = []
+
+    for user in users:
+        if user["status"] != "active":
+            continue
+        active_count += 1
+
+        for leaver in leavers:
+            if clean_id(user["user_id"]) == clean_id(leaver["employee_id"]):
+                found.append((user, leaver))
+
+    return active_count, found
+
+
 def main():
     if len(sys.argv) != 3:
         print("usage: python access_review.py users.csv leavers.csv")
@@ -16,18 +37,7 @@ def main():
     users = load(sys.argv[1])
     leavers = load(sys.argv[2])
 
-    active_count = 0
-    found = []
-
-    # TODO: ids not cleaned yet, " E1004" or "e1004" will not match
-    for user in users:
-        if user["status"] != "active":
-            continue
-        active_count += 1
-
-        for leaver in leavers:
-            if user["user_id"] == leaver["employee_id"]:
-                found.append((user, leaver))
+    active_count, found = find_leavers(users, leavers)
 
     print(f"checked {active_count} active accounts against {len(leavers)} leavers")
 

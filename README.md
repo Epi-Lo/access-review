@@ -25,8 +25,11 @@ Sample files are in `sample/`, all fake people.
 
 ## not done yet
 
-- ids must match exactly for now, no trimming or case fix
 - no dormant account check (no login for a long time)
 - no admin / privileged account check
 
 Python 3, no extra package needed.
+
+```sh
+python -m unittest
+```

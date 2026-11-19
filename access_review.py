@@ -84,6 +84,17 @@ def find_dormant(users, as_of, skip_ids):
     return dormant
 
 
+def find_admins(users):
+    admins = []
+    for user in users:
+        if not is_active(user):
+            continue
+        # TODO: only "admin" for now, real systems also got "superuser", "domain admin" etc
+        if (user.get("role") or "").strip().lower() == "admin":
+            admins.append(user)
+    return admins
+
+
 def show_login(user):
     return (user["last_login"] or "").strip() or "never"
 
@@ -123,6 +134,14 @@ def main():
     print(f"as of {as_of}, {len(dormant)} account(s) no login for {DORMANT_DAYS}+ days:")
     for user in dormant:
         print(f"  {user['user_id']}  {user['name']}  last login {show_login(user)}")
+
+    # role column is optional, old user list without it still can run
+    if users and "role" in users[0]:
+        admins = find_admins(users)
+        print()
+        print(f"{len(admins)} active admin account(s), each one should have an approval:")
+        for user in admins:
+            print(f"  {user['user_id']}  {user['name']}  last login {show_login(user)}")
 
 
 if __name__ == "__main__":

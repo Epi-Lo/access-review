@@ -4,7 +4,7 @@ Small script for user access review. Give it the user list from a system and the
 
 This is the most common finding in an ITGC access review, so start from this one first.
 
-It also lists active accounts with no login for 90+ days, as of the date you give (default today).
+It also lists active accounts with no login for 90+ days, as of the date you give (default today), and active admin accounts if the user list has a `role` column.
 
 ```sh
 python access_review.py sample/users.csv sample/leavers.csv 2026-11-18
@@ -18,11 +18,17 @@ checked 8 active accounts against 3 leavers
 
 as of 2026-11-18, 1 account(s) no login for 90+ days:
   E1009  Cheung Wing Yan  last login 2026-05-20
+
+2 active admin account(s), each one should have an approval:
+  E1002  Lee Mei Ling  last login 2026-11-10
+  E1006  Ho Chi Kit  last login 2026-08-01
 ```
+
+E1006 shows up as a leaver and as an admin. That is the worst kind, a leaver who still has admin rights.
 
 ## csv format
 
-`users.csv`: `user_id,name,status,last_login` (status is `active` or `disabled`)
+`users.csv`: `user_id,name,status,last_login` (status is `active` or `disabled`), plus optional `role`
 
 `leavers.csv`: `employee_id,name,leave_date`
 
@@ -33,7 +39,7 @@ Sample files are in `sample/`, all fake people.
 ## not done yet
 
 - 90 days is fixed for now
-- no admin / privileged account check
+- admin check only looks for role `admin`, other names like `superuser` not yet
 
 Python 3, no extra package needed.
 

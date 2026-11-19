@@ -1,10 +1,10 @@
-user_id,name,status,last_login
-E1001,Wong Ka Ming,active,2026-11-02
-E1002,Lee Mei Ling,active,2026-11-10
-E1003,Tan Wei Jie,disabled,2026-06-30
-E1004,Chan Tai Man,active,2026-10-12
-E1005,Lim Hui Min,active,2026-11-14
-E1006,Ho Chi Kit,active,2026-08-01
-E1007,Ng Siu Fong,active,2026-11-12
-E1008,Koh Jun Hao,active,2026-11-15
-E1009,Cheung Wing Yan,active,2026-05-20
+user_id,name,status,last_login,role
+E1001,Wong Ka Ming,active,2026-11-02,user
+E1002,Lee Mei Ling,active,2026-11-10,admin
+E1003,Tan Wei Jie,disabled,2026-06-30,admin
+E1004,Chan Tai Man,active,2026-10-12,user
+E1005,Lim Hui Min,active,2026-11-14,user
+E1006,Ho Chi Kit,active,2026-08-01,admin
+E1007,Ng Siu Fong,active,2026-11-12,user
+E1008,Koh Jun Hao,active,2026-11-15,user
+E1009,Cheung Wing Yan,active,2026-05-20,user

@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from datetime import date
 
-from access_review import LEAVER_COLS, find_dormant, find_leavers, find_no_id, load
+from access_review import LEAVER_COLS, find_admins, find_dormant, find_leavers, find_no_id, load
 
 
 def user(uid, status="active", last_login="2026-11-01"):
@@ -61,6 +61,16 @@ class FindDormantTest(unittest.TestCase):
     def test_never_login_is_dormant(self):
         dormant = find_dormant([user("E2002", last_login="")], date(2026, 11, 18), set())
         self.assertEqual(len(dormant), 1)
+
+
+class FindAdminsTest(unittest.TestCase):
+    def test_active_admin_listed(self):
+        users = [dict(user("E1002"), role="admin"), dict(user("E1001"), role="user")]
+        self.assertEqual([u["user_id"] for u in find_admins(users)], ["E1002"])
+
+    def test_disabled_admin_not_listed(self):
+        users = [dict(user("E1003", status="disabled"), role="admin")]
+        self.assertEqual(find_admins(users), [])
 
 
 class LoadTest(unittest.TestCase):

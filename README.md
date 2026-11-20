@@ -4,7 +4,7 @@ Small script for user access review. Give it the user list from a system and the
 
 This is the most common finding in an ITGC access review, so start from this one first.
 
-It also lists active accounts with no login for 90+ days, as of the date you give (default today), and active admin accounts if the user list has a `role` column.
+It also lists active accounts with no login for 90+ days, as of the date you give (default today), and active admin accounts if the user list has a `role` column. If your policy uses another number, pass `--days`, e.g. `--days 60`.
 
 ```sh
 python access_review.py sample/users.csv sample/leavers.csv 2026-11-18
@@ -38,7 +38,6 @@ Sample files are in `sample/`, all fake people.
 
 ## not done yet
 
-- 90 days is fixed for now
 - admin check only looks for role `admin`, other names like `superuser` not yet
 
 Python 3, no extra package needed.

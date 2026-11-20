@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from datetime import date
@@ -62,6 +64,12 @@ class FindDormantTest(unittest.TestCase):
         dormant = find_dormant([user("E2002", last_login="")], date(2026, 11, 18), set())
         self.assertEqual(len(dormant), 1)
 
+    def test_60_day_policy_catches_70_day_old_login(self):
+        # 2026-09-09 to 2026-11-18 is 70 days, 90 day rule miss it but 60 day policy should list
+        users = [user("E2003", last_login="2026-09-09")]
+        self.assertEqual(find_dormant(users, date(2026, 11, 18), set()), [])
+        self.assertEqual(len(find_dormant(users, date(2026, 11, 18), set(), days=60)), 1)
+
 
 class FindAdminsTest(unittest.TestCase):
     def test_active_admin_listed(self):
@@ -71,6 +79,17 @@ class FindAdminsTest(unittest.TestCase):
     def test_disabled_admin_not_listed(self):
         users = [dict(user("E1003", status="disabled"), role="admin")]
         self.assertEqual(find_admins(users), [])
+
+
+class CommandLineTest(unittest.TestCase):
+    def test_days_option_changes_the_dormant_rule(self):
+        here = os.path.dirname(os.path.abspath(__file__))
+        result = subprocess.run(
+            [sys.executable, "access_review.py", "sample/users.csv", "sample/leavers.csv", "2026-11-18", "--days", "60"],
+            cwd=here, capture_output=True, text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("no login for 60+ days", result.stdout)
 
 
 class LoadTest(unittest.TestCase):

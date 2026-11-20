@@ -1,8 +1,9 @@
+import argparse
 import csv
 import sys
 from datetime import date, timedelta
 
-# TODO: 90 days hard code for now, some policy use 60
+# default only, some policy use 60, can change with --days
 DORMANT_DAYS = 90
 
 USER_COLS = ["user_id", "name", "status", "last_login"]
@@ -60,8 +61,8 @@ def find_no_id(users):
     return no_id
 
 
-def find_dormant(users, as_of, skip_ids):
-    cutoff = as_of - timedelta(days=DORMANT_DAYS)
+def find_dormant(users, as_of, skip_ids, days=DORMANT_DAYS):
+    cutoff = as_of - timedelta(days=days)
     dormant = []
 
     for user in users:
@@ -77,7 +78,7 @@ def find_dormant(users, as_of, skip_ids):
             dormant.append(user)
             continue
 
-        # <= not <, exactly 90 days also count as 90+
+        # <= not <, exactly on the cutoff day also count
         if date.fromisoformat(last_login) <= cutoff:
             dormant.append(user)
 
@@ -100,14 +101,19 @@ def show_login(user):
 
 
 def main():
-    if len(sys.argv) not in (3, 4):
-        print("usage: python access_review.py users.csv leavers.csv [as_of yyyy-mm-dd]")
-        sys.exit(1)
-
-    users = load(sys.argv[1], USER_COLS)
-    leavers = load(sys.argv[2], LEAVER_COLS)
+    # now got --days also, counting len(sys.argv) getting messy, argparse easier
+    parser = argparse.ArgumentParser(description="check a system user list against the hr leaver list")
+    parser.add_argument("users", help="users.csv from the system")
+    parser.add_argument("leavers", help="leavers.csv from hr")
     # review is always "as of" some date, normally period end. default today
-    as_of = date.fromisoformat(sys.argv[3]) if len(sys.argv) == 4 else date.today()
+    parser.add_argument("as_of", nargs="?", help="yyyy-mm-dd, default today")
+    parser.add_argument("--days", type=int, default=DORMANT_DAYS,
+                        help=f"no login for this many days = dormant, default {DORMANT_DAYS}")
+    args = parser.parse_args()
+
+    users = load(args.users, USER_COLS)
+    leavers = load(args.leavers, LEAVER_COLS)
+    as_of = date.fromisoformat(args.as_of) if args.as_of else date.today()
 
     active_count, found = find_leavers(users, leavers)
 
@@ -128,10 +134,10 @@ def main():
             print(f"  {user['name']}  last login {show_login(user)}")
 
     skip_ids = {clean_id(user["user_id"]) for user, _ in found}
-    dormant = find_dormant(users, as_of, skip_ids)
+    dormant = find_dormant(users, as_of, skip_ids, args.days)
 
     print()
-    print(f"as of {as_of}, {len(dormant)} account(s) no login for {DORMANT_DAYS}+ days:")
+    print(f"as of {as_of}, {len(dormant)} account(s) no login for {args.days}+ days:")
     for user in dormant:
         print(f"  {user['user_id']}  {user['name']}  last login {show_login(user)}")
 

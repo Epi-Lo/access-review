@@ -56,9 +56,11 @@ def find_leavers(users, leavers):
 def login_after_leave(user, leaver):
     # still active is one thing, login after leave date means someone really using it
     last_login = (user["last_login"] or "").strip()
-    if last_login == "":
+    leave_date = (leaver["leave_date"] or "").strip()
+    # one side empty cannot compare, the leaver line still show anyway
+    if last_login == "" or leave_date == "":
         return False
-    return date.fromisoformat(last_login) > date.fromisoformat(leaver["leave_date"].strip())
+    return date.fromisoformat(last_login) > date.fromisoformat(leave_date)
 
 
 def find_no_id(users):

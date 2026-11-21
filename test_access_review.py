@@ -52,6 +52,11 @@ class LoginAfterLeaveTest(unittest.TestCase):
     def test_never_login_leaver_no_crash(self):
         self.assertFalse(login_after_leave(user("E1010", last_login=""), leaver("E1010")))
 
+    def test_hr_leave_date_empty_no_crash(self):
+        # hr sometimes leave the date empty, main branch still print the report before
+        no_date = dict(leaver("E1004"), leave_date="")
+        self.assertFalse(login_after_leave(user("E1004", last_login="2026-10-12"), no_date))
+
 
 class FindDormantTest(unittest.TestCase):
     def test_old_login_is_dormant(self):

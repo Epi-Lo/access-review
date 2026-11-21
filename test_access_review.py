@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from datetime import date
 
-from access_review import LEAVER_COLS, find_admins, find_dormant, find_leavers, find_no_id, load
+from access_review import LEAVER_COLS, find_admins, find_dormant, find_leavers, find_no_id, load, login_after_leave
 
 
 def user(uid, status="active", last_login="2026-11-01"):
@@ -42,6 +42,20 @@ class FindLeaversTest(unittest.TestCase):
         _, found = find_leavers([user("")], [leaver("")])
         self.assertEqual(found, [])
         self.assertEqual(len(find_no_id([user("")])), 1)
+
+
+class LoginAfterLeaveTest(unittest.TestCase):
+    def test_login_after_leave_date(self):
+        # left 09-30 but still login on 10-12, someone using the account already
+        self.assertTrue(login_after_leave(user("E1004", last_login="2026-10-12"), leaver("E1004")))
+
+    def test_never_login_leaver_no_crash(self):
+        self.assertFalse(login_after_leave(user("E1010", last_login=""), leaver("E1010")))
+
+    def test_hr_leave_date_empty_no_crash(self):
+        # hr sometimes leave the date empty, main branch still print the report before
+        no_date = dict(leaver("E1004"), leave_date="")
+        self.assertFalse(login_after_leave(user("E1004", last_login="2026-10-12"), no_date))
 
 
 class FindDormantTest(unittest.TestCase):
@@ -90,6 +104,15 @@ class CommandLineTest(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("no login for 60+ days", result.stdout)
+
+    def test_report_marks_login_after_leaving(self):
+        here = os.path.dirname(os.path.abspath(__file__))
+        result = subprocess.run(
+            [sys.executable, "access_review.py", "sample/users.csv", "sample/leavers.csv", "2026-11-18"],
+            cwd=here, capture_output=True, text=True,
+        )
+        e1004 = [line for line in result.stdout.splitlines() if "E1004" in line][0]
+        self.assertIn("login after leaving", e1004)
 
 
 class LoadTest(unittest.TestCase):

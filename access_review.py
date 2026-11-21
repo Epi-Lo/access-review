@@ -53,6 +53,16 @@ def find_leavers(users, leavers):
     return active_count, found
 
 
+def login_after_leave(user, leaver):
+    # still active is one thing, login after leave date means someone really using it
+    last_login = (user["last_login"] or "").strip()
+    leave_date = (leaver["leave_date"] or "").strip()
+    # one side empty cannot compare, the leaver line still show anyway
+    if last_login == "" or leave_date == "":
+        return False
+    return date.fromisoformat(last_login) > date.fromisoformat(leave_date)
+
+
 def find_no_id(users):
     no_id = []
     for user in users:
@@ -124,7 +134,10 @@ def main():
     else:
         print(f"{len(found)} leaver(s) still active:")
         for user, leaver in found:
-            print(f"  {user['user_id']}  {user['name']}  left {leaver['leave_date']}  last login {show_login(user)}")
+            line = f"  {user['user_id']}  {user['name']}  left {leaver['leave_date']}  last login {show_login(user)}"
+            if login_after_leave(user, leaver):
+                line += "  <- login after leaving"
+            print(line)
 
     no_id = find_no_id(users)
     if no_id:

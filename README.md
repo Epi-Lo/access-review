@@ -13,8 +13,8 @@ python access_review.py sample/users.csv sample/leavers.csv 2026-11-18
 ```
 checked 8 active accounts against 3 leavers
 2 leaver(s) still active:
-  E1004  Chan Tai Man  left 2026-09-30  last login 2026-10-12
-  E1006  Ho Chi Kit  left 2026-07-31  last login 2026-08-01
+  E1004  Chan Tai Man  left 2026-09-30  last login 2026-10-12  <- login after leaving
+  E1006  Ho Chi Kit  left 2026-07-31  last login 2026-08-01  <- login after leaving
 
 as of 2026-11-18, 1 account(s) no login for 90+ days:
   E1009  Cheung Wing Yan  last login 2026-05-20
@@ -23,6 +23,8 @@ as of 2026-11-18, 1 account(s) no login for 90+ days:
   E1002  Lee Mei Ling  last login 2026-11-10
   E1006  Ho Chi Kit  last login 2026-08-01
 ```
+
+`<- login after leaving` means the last login is after the leave date. Account not disabled is already a finding, but this one means somebody really used it after the person left, so check who first.
 
 E1006 shows up as a leaver and as an admin. That is the worst kind, a leaver who still has admin rights.
 
